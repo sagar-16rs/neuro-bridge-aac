@@ -1,6 +1,6 @@
 # Neuro-Bridge 9.0: Fatigue-Adaptive AAC System
 
-> **Submission for Convolve 4.0 (Pan-IIT AI/ML Hackathon)**
+> **Convolve 4.0 (Pan-IIT AI/ML Hackathon)**
 > **Track:** Healthcare & Accessibility
 
 
