@@ -88,7 +88,7 @@ This system is not a first draft. It is the result of 9 major iterations, evolvi
 ### Installation
 ```bash
 # 1. Clone the repository
-git clone 
+git clone gh repo clone sagar-16rs/neuro-bridge-aac
 cd neuro-bridge-aac
 
 # 2. Create a virtual environment (Optional but recommended)
