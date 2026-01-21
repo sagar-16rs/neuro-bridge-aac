@@ -73,3 +73,66 @@ python -m venv venv
 
 # 3. Install dependencies
 pip install -r requirements.txt
+```
+
+## How to Use
+
+### Step 1: Calibration (Teaching Mode)
+The system needs to learn *your* face and specific gestures.
+```bash
+python teach_gestures.py
+```
+> Enter Label: Type IDLE -> Sit still for 3 seconds.
+
+> Enter Label: Type WATER -> Perform your gesture (e.g., Puff Cheeks).
+
+> Enter Label: Type YES -> Look UP. (These vectors are saved locally to ./neuro_bridge_memory).
+
+### Step 2: Run the Cognitive Agent
+Start the live communication system.
+```bash
+python main_agent_pro_2.py
+```
+> Green HUD: System is Scanning.
+
+> Orange HUD: System is Negotiating (Active Learning).
+
+> Voice: Speaks when confidence > 88%.
+
+## 🧠 The "Thinking" Engine (Traceable Reasoning)
+
+Unlike "Black Box" AI, Neuro-Bridge follows a transparent, deterministic reasoning path. Every 33ms, the **Cognitive Agent** executes the following logic chain to prevent false positives and ensure safety.
+
+### 1. The Decision Logic Flow
+```mermaid
+graph TD
+    A[Webcam Input] -->|MediaPipe| B(99D Face Vector)
+    B --> C{Fatigue Analysis}
+    C -->|Alert User| D[High Threshold 0.88]
+    C -->|Tired User| E[Low Threshold 0.70]
+    D --> F[Qdrant Search]
+    E --> F
+    F --> G{Similarity Score?}
+    G -->|Score > Threshold| H[EXECUTE Command]
+    G -->|Score 0.45 - Threshold| I[NEGOTIATE: Ask User]
+    G -->|Score < 0.45| J[Ignore: IDLE]
+    I -->|User Blinks| K[LEARN: Update Qdrant]
+```
+
+## 2. Sample Reasoning Trace (Log Extract)
+How the system decides to speak vs. wait based on Fatigue metrics:
+
+> [T=0.0s] Input: Face Vector received. EAR=0.30 (User Alert). [T=0.1s] Retrieval: Nearest match "WATER". Similarity=0.92. Required=0.88. [T=0.1s] Decision: 0.92 > 0.88 → High Confidence. [T=0.1s] Action: EXECUTE "I need Water."
+
+> (... 2 hours later, patient is tired ...)
+
+> [T=7200s] Input: Face Vector received. EAR=0.15 (User Fatigued). [T=7200.1s] Reasoning: Fatigue Detected. Lowering Threshold to 0.75. [T=7200.1s] Retrieval: Nearest match "WATER". Similarity=0.78. [T=7200.1s] Decision: 0.78 > 0.75 (Adaptive) → Success. [T=7200.1s] Note: Without adaptation, this would have failed (0.78 < 0.88).
+
+## 3. The Consistency Manager (Debouncing)
+To filter out ALS fasciculations (involuntary muscle spasms), we do not act on a single frame.
+
+Buffer: Stores the last 8 decisions.
+
+Rule: An Action is only taken if it appears in >60% of the buffer.
+
+Result: Random twitches are ignored; only deliberate, sustained gestures trigger the voice.
